@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { hasEnvVars } from "../utils";
 
-export async function updateSession(request: NextRequest) {
+const PROTECTED_PREFIXES = ["/host"];
+
+export async function handleSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -25,17 +27,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
+            request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, options)
           );
         },
       },
-    },
+    }
   );
 
   // Do not run code between createServerClient and
@@ -47,15 +49,26 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const path = request.nextUrl.pathname;
+
+  // --- Anonymous session creation for guest URLs ---
+  if (path.startsWith("/party/") && !user) {
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.searchParams.set("error", "session_failed");
+      return NextResponse.redirect(url);
+    }
+  }
+
+  const isHost = user && !user.is_anonymous;
+  const requiresAuth = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
+
+  if (requiresAuth && !isHost) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = "/auth/sign-in";
+    url.searchParams.set("next", path);
     return NextResponse.redirect(url);
   }
 
