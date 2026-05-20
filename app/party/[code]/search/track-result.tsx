@@ -1,4 +1,6 @@
 import { submitRequest } from "./actions";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ListPlusIcon } from "@hugeicons/core-free-icons";
 
 type Track = {
   id: string;
@@ -27,13 +29,13 @@ export function TrackResult({
     "";
 
   return (
-    <li className="flex items-center gap-3 rounded-md border p-2">
+    <li className="flex items-center gap-3 p-2">
       {albumArt && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={albumArt}
           alt=""
-          className="h-12 w-12 flex-shrink-0 rounded"
+          className="h-12 w-12 flex-shrink-0 "
           loading="lazy"
         />
       )}
@@ -56,9 +58,14 @@ export function TrackResult({
         />
         <button
           type="submit"
-          className="rounded-md bg-green-500 px-3 py-1 text-sm font-medium text-white"
+          className="rounded-md px-3 py-1 text-sm font-medium text-white "
         >
-          Request
+          <HugeiconsIcon
+            icon={ListPlusIcon}
+            size={24}
+            color="currentColor"
+            strokeWidth={1.5}
+          />
         </button>
       </form>
     </li>

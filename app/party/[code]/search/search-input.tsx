@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { useState, useTransition, useRef, useEffect } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Search02Icon } from '@hugeicons/core-free-icons';
 
 export function SearchInput({
   code,
@@ -17,13 +19,12 @@ export function SearchInput({
 
   useEffect(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
     timeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams();
-      if (query.trim()) params.set("q", query.trim());
+      if (query.trim()) params.set('q', query.trim());
       const qs = params.toString();
       startTransition(() => {
-        router.replace(`/party/${code}/search${qs ? `?${qs}` : ""}`);
+        router.replace(`/party/${code}/search${qs ? `?${qs}` : ''}`);
       });
     }, 300);
 
@@ -33,17 +34,27 @@ export function SearchInput({
   }, [query, code, router]);
 
   return (
-    <div className="sticky top-0 z-10 bg-white pb-2">
-      <input
-        type="search"
-        inputMode="search"
-        enterKeyHint="search"
-        autoFocus
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for a song..."
-        className="w-full rounded-md border px-4 py-3 text-base"
-      />
+    <div className="sticky top-0 z-10 pb-2">
+      <label
+        className="flex items-center gap-3 rounded-full border bg-white px-4 py-3 text-gray-500 focus-within:border-gray-400"
+      >
+        <HugeiconsIcon
+          icon={Search02Icon}
+          size={24}
+          color="currentColor"
+          strokeWidth={1.5}
+        />
+        <input
+          type="search"
+          inputMode="search"
+          enterKeyHint="search"
+          autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Sök efter låt..."
+          className="w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-500"
+        />
+      </label>
     </div>
   );
 }

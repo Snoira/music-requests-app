@@ -10,7 +10,7 @@ export default function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   return (
-    <main className="p-4">
+    <main className="p-4 mx-auto max-w-2xl">
       <Suspense fallback={null}>
         <SearchPageContent params={params} searchParams={searchParams} />
       </Suspense>
@@ -44,7 +44,7 @@ async function SearchPageContent({
 
 function ResultsLoading() {
   return (
-    <ul className="mt-4 space-y-2">
+    <ul className="mt-4 space-y-1">
       {Array.from({ length: 5 }).map((_, i) => (
         <li key={i} className="h-14 animate-pulse rounded-md bg-gray-100" />
       ))}

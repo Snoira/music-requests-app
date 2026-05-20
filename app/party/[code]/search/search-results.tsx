@@ -70,7 +70,7 @@ export async function SearchResults({
   }
 
   return (
-    <ul className="mt-4 space-y-2">
+    <ul className="mt-4 space-y-1">
       {tracks.map((track) => (
         <TrackResult
           key={track.id}

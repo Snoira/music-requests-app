@@ -1,5 +1,9 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { PartyHeader } from "./party-header";
+import { SearchLink } from "./search-link";
+import { NowPlaying } from "./now-playing";
+import { QueueList } from "./queue-list";
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_code: "We couldn't find that party. Check the code and try again.",
@@ -24,8 +28,8 @@ export default function PartyPage({
   params: Promise<{ code: string }>;
 }) {
   return (
-    <main className="p-8">
-      <Suspense fallback={<PartyLoading />}>
+    <main>
+      <Suspense fallback={<PageSkeleton />}>
         <PartyContent params={params} />
       </Suspense>
     </main>
@@ -56,7 +60,7 @@ export async function PartyContent({
   // RLS now permits this read because the user is a member.
   const { data: party } = await supabase
     .from("parties")
-    .select("id, name, status, auto_approve")
+    .select("id, name, status, join_code, auto_approve, host_id")
     .eq("id", partyId!)
     .single();
 
@@ -66,12 +70,15 @@ export async function PartyContent({
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">{party.name}</h1>
-      <p className="text-sm text-gray-600">
-        Status: {party.status}
-        {party.auto_approve ? " · auto-approve on" : ""}
-      </p>
-      <p className="mt-4 text-gray-500">Request submission UI coming next…</p>
+      <PartyHeader party={party} />
+
+      <SearchLink code={code} />
+      <Suspense fallback={null}>
+        <NowPlaying hostId={party.host_id} />
+      </Suspense>
+      <Suspense fallback={<QueueSkeleton />}>
+        <QueueList partyId={party.id} />
+      </Suspense>
     </>
   );
 }
@@ -84,11 +91,25 @@ function ErrorBanner({ message }: { message: string }) {
   );
 }
 
-function PartyLoading() {
+function PageSkeleton() {
   return (
-    <div className="space-y-2">
-      <div className="h-7 w-1/3 animate-pulse rounded bg-gray-200" />
-      <div className="h-4 w-1/4 animate-pulse rounded bg-gray-200" />
-    </div>
+    <>
+      <div className="h-48 w-full animate-pulse bg-gray-200 md:h-64 " />
+      <div className="mx-auto max-w-2xl space-y-4 px-4 py-4">
+        <div className="h-8 w-1/2 animate-pulse rounded bg-gray-200" />
+        <div className="h-4 w-1/3 animate-pulse rounded bg-gray-200" />
+        <div className="h-12 w-full animate-pulse rounded bg-gray-200" />
+      </div>
+    </>
+  );
+}
+
+function QueueSkeleton() {
+  return (
+    <ul className="mt-4 space-y-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <li key={i} className="h-14 animate-pulse rounded-md bg-gray-100" />
+      ))}
+    </ul>
   );
 }
