@@ -45,12 +45,14 @@ export async function NowPlaying({ hostId }: { hostId: string }) {
         )}
         <div className="min-w-0 flex-1">
           {data.is_playing ? (
-            <span className="inline-flex items-center ">
+            <span className="flex items-center min-w-0">
               <span className="flex h-3 w-3 mr-2" aria-label="Playing">
                 <span className="absolute inline-flex h-3 w-3 animate-ping rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
               </span>
-              <p className="truncate font-medium text-green-500">{track.name}</p>
+              <p className="truncate font-medium text-green-500">
+                {track.name}
+              </p>
             </span>
           ) : (
             <p className="truncate font-medium">{track.name}</p>
