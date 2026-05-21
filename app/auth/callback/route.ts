@@ -1,26 +1,24 @@
 import "server-only";
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { createRouteHandlerClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/admin";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  let next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/host";
 
-  if (!next.startsWith("/")) {
-    next = "/";
-  }
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=missing_code`);
+    return NextResponse.redirect(`${origin}/sign-in?error=missing_code`);
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const response = NextResponse.redirect(`${origin}${next}`);
+  const supabase = createRouteHandlerClient(request, response);
 
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.session) {
     return NextResponse.redirect(
-      `${origin}/login?error=${encodeURIComponent(
+      `${origin}/sign-in?error=${encodeURIComponent(
         error?.message ?? "auth_failed"
       )}`
     );
@@ -34,7 +32,7 @@ export async function GET(request: Request) {
   };
 
   if (!provider_token || !provider_refresh_token || !user) {
-    return NextResponse.redirect(`${origin}/login?error=no_spotify_tokens`);
+    return NextResponse.redirect(`${origin}/sign-in?error=no_spotify_tokens`);
   }
 
   const admin = createServiceRoleClient();
@@ -51,8 +49,8 @@ export async function GET(request: Request) {
 
   if (upsertError) {
     return NextResponse.redirect(
-      `${origin}/login?error=${encodeURIComponent("token_save_failed")}`
+      `${origin}/sign-in?error=${encodeURIComponent("token_save_failed")}`
     );
   }
-  return NextResponse.redirect(`${origin}${next}`);
+  return response;
 }
