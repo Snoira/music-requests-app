@@ -1,6 +1,5 @@
 import { submitRequest } from "./actions";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ListPlusIcon } from "@hugeicons/core-free-icons";
+import { SubmitButton } from "./submit-button";
 
 type Track = {
   id: string;
@@ -13,36 +12,22 @@ type Track = {
   };
 };
 
-export function TrackResult({
-  track,
-  partyId,
-  code,
-}: {
+type TrackResultProps = {
   track: Track;
   partyId: string;
   code: string;
-}) {
+};
+
+export function TrackResult({ track, partyId, code }: TrackResultProps) {
   const artists = track.artists.map((a) => a.name).join(", ");
+
   const albumArt =
     track.album.images.find((img) => img.width <= 64)?.url ??
-    track.album.images[track.album.images.length - 1]?.url ??
+    track.album.images.at(-1)?.url ??
     "";
 
   return (
-    <li className="flex items-center gap-3 p-2">
-      {albumArt && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={albumArt}
-          alt=""
-          className="h-12 w-12 flex-shrink-0 "
-          loading="lazy"
-        />
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{track.name}</p>
-        <p className="truncate text-xs text-gray-500">{artists}</p>
-      </div>
+    <li>
       <form action={submitRequest}>
         <input type="hidden" name="code" value={code} />
         <input type="hidden" name="party_id" value={partyId} />
@@ -56,17 +41,12 @@ export function TrackResult({
           name="duration_ms"
           value={String(track.duration_ms)}
         />
-        <button
-          type="submit"
-          className="rounded-md px-3 py-1 text-sm font-medium text-white "
-        >
-          <HugeiconsIcon
-            icon={ListPlusIcon}
-            size={24}
-            color="currentColor"
-            strokeWidth={1.5}
-          />
-        </button>
+
+        <SubmitButton
+          trackName={track.name}
+          artists={artists}
+          albumArt={albumArt}
+        />
       </form>
     </li>
   );
