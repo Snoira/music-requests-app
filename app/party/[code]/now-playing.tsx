@@ -34,7 +34,7 @@ export async function NowPlaying({ hostId }: { hostId: string }) {
   const artists = track.artists.map((a) => a.name).join(", ");
 
   return (
-    <section className="mt-6 max-w-2xl">
+    <section className="mt-6 md:mx-auto max-w-2xl">
       <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mx-4">
         Now Playing
       </p>

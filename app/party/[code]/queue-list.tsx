@@ -16,16 +16,16 @@ export async function QueueList({ partyId }: { partyId: string }) {
     .select("id, track_name, artist_name, album_art_url, duration_ms")
     .eq("party_id", partyId)
     .eq("status", "approved")
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .returns<RequestRow[]>();
 
   if (!requests || requests.length === 0) {
     return (
-      <section className="mt-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-gray-500">
+      <section className="mt-6 mx-4 md:mx-auto max-w-2xl">
+        <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mx-4">
           Up Next
         </p>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-500 mx-4">
           No songs queued yet. Be the first to request one!
         </p>
       </section>
@@ -33,7 +33,7 @@ export async function QueueList({ partyId }: { partyId: string }) {
   }
 
   return (
-    <section className="mt-6">
+    <section className="mt-6 md:mx-auto max-w-2xl">
       <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mx-4">
         Up Next
       </p>

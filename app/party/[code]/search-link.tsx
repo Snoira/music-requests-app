@@ -6,7 +6,7 @@ export function SearchLink({ code }: { code: string }) {
   return (
     <Link
       href={`/party/${code}/search`}
-      className="flex items-center gap-3 rounded-full border bg-white px-4 py-3 text-gray-500 hover:bg-gray-50 mx-4"
+      className="flex items-center gap-3 rounded-full border bg-white px-4 py-3 text-gray-500 hover:bg-gray-50 mx-4 md:mx-auto max-w-2xl"
     >
       <HugeiconsIcon
         icon={Search02Icon}
